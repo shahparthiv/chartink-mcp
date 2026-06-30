@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.Python
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Secrets — NEVER commit Chartink cookies or any credentials
+cookies.txt
+*.cookies
+.env
+secrets*
+
+# Data / cache (backtest price caches, CSV exports)
+*.pkl
+*.csv
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
