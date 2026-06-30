@@ -22,7 +22,7 @@ You describe a strategy in plain English, the agent writes the Chartink **scan c
 
 ## Requirements
 
-- **Python 3.10+** (developed on 3.11)
+- **Python 3.10+** (developed on 3.11) — required by the `mcp` package; your system's default `python3` may be older, see [Installation](#installation)
 - A **Chartink account** (free works for most scans; some features need premium)
 - An MCP-compatible client: **Claude Desktop**, **Claude Code**, or any agent that speaks MCP over stdio
 
@@ -30,20 +30,44 @@ You describe a strategy in plain English, the agent writes the Chartink **scan c
 
 ## Installation
 
+> ⚠️ **Check your Python version first.** The `mcp` package requires **Python 3.10+**. On many machines the default `python3` is older (e.g. macOS ships 3.9), and `pip install mcp` will fail with a dependency/`SyntaxError`. Verify:
+> ```bash
+> python3 --version        # must be 3.10 or newer
+> ```
+> If it's older, use one of the options below to get a 3.10+ interpreter.
+
 ```bash
 # 1. Clone
 git clone https://github.com/<your-username>/chartink-mcp.git
 cd chartink-mcp
+```
 
-# 2. Create a virtual environment
-python3 -m venv venv
+### Option A — using `uv` (recommended; handles the Python version for you)
+
+[`uv`](https://docs.astral.sh/uv/) auto-downloads a suitable Python, so you don't need a system 3.10+:
+
+```bash
+uv venv venv --python 3.11        # creates ./venv with Python 3.11
+uv pip install --python venv/bin/python -r requirements.txt
+```
+
+### Option B — plain `venv` + `pip`
+
+```bash
+# Use a 3.10+ interpreter. If `python3` is too old, call a specific one,
+# e.g. python3.11 / python3.12 (install via Homebrew: `brew install python@3.11`).
+python3.11 -m venv venv           # or: python3 -m venv venv  (only if 3.10+)
 source venv/bin/activate          # Windows: venv\Scripts\activate
-
-# 3. Install dependencies
 pip install -r requirements.txt
 ```
 
 Dependencies (`requirements.txt`): `mcp`, `requests`, `beautifulsoup4`.
+
+**Verify the install:**
+```bash
+venv/bin/python --version                       # should print 3.10+
+venv/bin/python -c "import server; print('OK')"  # deps load, server importable
+```
 
 Note the **absolute path** to the venv's Python and to `server.py` — you'll need them for the client config:
 
@@ -198,7 +222,8 @@ chartink-mcp/
 
 | Symptom | Fix |
 |---------|-----|
-| Tools don't appear in the client | Check the absolute paths in the config; restart the client. |
+| `pip install` fails on `mcp` / `SyntaxError` during install | Your Python is < 3.10. Build the venv with a 3.10+ interpreter (`python3.11 -m venv venv`) or use the `uv` option in [Installation](#installation). |
+| Tools don't appear in the client | Check the absolute paths in the config; restart the client (Claude Desktop must be fully quit & reopened). |
 | `XSRF-TOKEN not found` / `are you logged in?` | Re-run `set_cookies` with a fresh cookie string from a logged-in browser. |
 | Requests suddenly fail | Session expired — set cookies again. |
 | `run_saved_screener` says "Could not extract scan_clause" | That scan is **private** (its clause isn't in the public page). Ask the owner for the clause and use `run_screener` instead. |
