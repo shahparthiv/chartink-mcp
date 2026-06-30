@@ -234,7 +234,8 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
         try:
             data = _post_screener(scan_clause, max_rows)
             stocks = data.get("data", [])
-            result = {"screener": label, "count": len(stocks), "stocks": stocks}
+            result = {"screener": label, "count": len(stocks),
+                      "returned": min(len(stocks), max_rows), "stocks": stocks[:max_rows]}
             return [TextContent(type="text", text=json.dumps(result, indent=2))]
         except Exception as e:
             return [TextContent(type="text", text=f"Error: {e}")]
@@ -243,10 +244,12 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
         screeners = arguments["screeners"]
         results = []
         for s in screeners:
+            mr = s.get("max_rows", 160)
             try:
-                data = _post_screener(s["scan_clause"], s.get("max_rows", 160))
+                data = _post_screener(s["scan_clause"], mr)
                 stocks = data.get("data", [])
-                results.append({"screener": s["name"], "count": len(stocks), "stocks": stocks})
+                results.append({"screener": s["name"], "count": len(stocks),
+                                "returned": min(len(stocks), mr), "stocks": stocks[:mr]})
             except Exception as e:
                 results.append({"screener": s["name"], "error": str(e)})
         return [TextContent(type="text", text=json.dumps(results, indent=2))]
@@ -258,7 +261,8 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
         try:
             data = _post_backtest(scan_clause, max_rows)
             stocks = data.get("data", [])
-            result = {"backtest": label, "count": len(stocks), "stocks": stocks}
+            result = {"backtest": label, "count": len(stocks),
+                      "returned": min(len(stocks), max_rows), "stocks": stocks[:max_rows]}
             return [TextContent(type="text", text=json.dumps(result, indent=2))]
         except Exception as e:
             return [TextContent(type="text", text=f"Error: {e}")]
@@ -280,7 +284,8 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
             scan_clause = (clause_tag.get("value") or clause_tag.string or "").strip()
             data = _post_screener(scan_clause, max_rows, referer=url)
             stocks = data.get("data", [])
-            result = {"screener": slug, "scan_clause": scan_clause, "count": len(stocks), "stocks": stocks}
+            result = {"screener": slug, "scan_clause": scan_clause, "count": len(stocks),
+                      "returned": min(len(stocks), max_rows), "stocks": stocks[:max_rows]}
             return [TextContent(type="text", text=json.dumps(result, indent=2))]
         except Exception as e:
             return [TextContent(type="text", text=f"Error: {e}")]
