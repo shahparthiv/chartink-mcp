@@ -56,7 +56,7 @@ echo "$(pwd)/server.py"         # → args[0]
 
 ## Configuration
 
-The server runs over **stdio**. Point your MCP client at the venv Python + `server.py`.
+The server runs over **stdio**. Point your MCP client at the venv Python + `server.py`. Ready-to-edit templates live in [`config-examples/`](config-examples/).
 
 ### Claude Desktop
 
